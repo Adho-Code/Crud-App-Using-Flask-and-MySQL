@@ -2,10 +2,10 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 import pymysql.cursors
 
 # Connect to the database
-connection = pymysql.connect(host='localhost',
-                             user='devops04',
-                             password='chukula@adho13',
-                             db='ansible',
+connection = pymysql.connect(host='flask_db_container',
+                             user='simon',
+                             password='demopass123',
+                             db='my_db',
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
 

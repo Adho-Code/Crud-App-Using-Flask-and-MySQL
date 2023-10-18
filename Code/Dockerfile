@@ -20,4 +20,4 @@ COPY . /app
 
 
 EXPOSE 8000
-CMD ["python3", "app.py"]
+ENTRYPOINT ["python3", "app.py"]
