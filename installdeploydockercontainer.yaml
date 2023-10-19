@@ -1,58 +1,77 @@
-- hosts: all
+---
+- name: Build and Run Flask App and MySQL Containers
+  hosts: demoserver
   become: yes
+  become_method: sudo
+
   tasks:
+    - name: Install pip
+      apt:
+        name: python3-pip
+        state: present
+    - name: install docker-py package
+      pip:
+        name: docker-py
+        state: present
 
-  - name: Create a network with custom IPv4 address config
-    community.docker.docker_network:
-      name: flaskapp_network
-      driver: bridge
-      attachable: true
-      ipam_config:
-        - subnet: 172.16.0.0/28
-          gateway: 172.16.0.1
-          iprange: 172.16.0.0/28
+    - name: Create Custom Bridge Network
+      docker_network:
+        name: flaskapp_network
+        state: present
+        attachable: true
+        ipam_config:
+          - subnet: 172.16.0.0/28
+            gateway: 172.16.0.1
+            iprange: 172.16.0.0/28
 
-    - name: Create the MySQL db volume
-    community.docker.docker_volume:
-      name: db_vol
-      driver: local
-
-    - name: Create the data container
-      community.docker.docker_container:
-        name: mydata_container
+    - name: Create BusyBox Data Container
+      docker_container:
+        name: busybox-data-container
         image: busybox
+        state: started
         volumes:
-          - /db_vol
+          - /data # Mount an empty volume to /data in the busybox container
 
-    - name: Deploy flask-app
-      community.docker.docker_container:
-        name: flask-app
-        image: flask-app:latest
+    - name: Build Flask App Docker Image
+      docker_image:
+        name: flask-app:1.0.0
+        source: build
+        build:
+          path: Code
+        state: present
+
+    - name: Run Flask App Container
+      docker_container:
+        name: flask-app-container
+        image: flask-app:1.0.0
+        state: started
         ports:
-          - "8000:8000"
-        networks:
-          - name: flaskapp_network
+          - '5000:5000'
         volumes:
-          - flask-app:/var/www/html
-        env:
-          DATABASE_HOST: "db"
-          DATABASE_USER: "devops04"
-          DATABASE_PASSWORD: "chukula@adho13"
-          DATABASE_NAME: "ansible"
-          
-        restart_policy: always
-
-    - name: Deploy MYSQL
-      community.docker.docker_container:
-        name: db
-        image: mysql:5.7
+          - /data:/app/data
         networks:
-          - name: flaskapp_network
+          - flask_network
+
+    - name: Build MySQL Docker Container
+      docker_image:
+        name: mysql-db:1.0.0
+        source: build
+        build:
+          path: db
+        state: present
+
+    - name: Run MySQL Container
+      docker_container:
+        name: mysql-db-container
+        image: mysql-db:1.0.0
+        state: started
+        env:
+          MYSQL_ROOT_PASSWORD: '1'
+          MYSQL_DATABASE: 'ansible'
+          MYSQL_USER: 'devops04'
+          MYSQL_PASSWORD: 'chukula@adho13'
+        ports:
+          - '3307:3306'
         volumes:
           - db:/var/lib/mysql
-        env:
-          MYSQL_DATABASE: "exampledb"
-          MYSQL_USER: "exampleuser"
-          MYSQL_PASSWORD: "examplepass"
-          MYSQL_RANDOM_ROOT_PASSWORD: '1'
-        restart_policy: always
+          - /data:/app/data
