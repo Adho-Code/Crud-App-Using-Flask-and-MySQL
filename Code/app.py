@@ -1,19 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-import pymysql.cursors
+# import pymysql.cursors
+from flask_sqlalchemy import SQLAlchemy
 
 # Connect to the database
 # try:
-connection = pymysql.connect(
-    host='flask_db_container',
-    # host='localhost',
-    port=3306,
-    user='simon',
-    password='demopass123',
-    database='my_db',
-    charset='utf8mb4',
-    cursorclass=pymysql.cursors.DictCursor
-)
-print("Connected to the database.")
+# connection = pymysql.connect(
+#     host='flask_db_container',
+#     # host='localhost',
+#     port=3306,
+#     user='simon',
+#     password='demopass123',
+#     database='my_db',
+#     charset='utf8mb4',
+#     cursorclass=pymysql.cursors.DictCursor
+# )
+# print("Connected to the database.")
 #     connection.close()
 # except Exception as e:
 #     print(f"Error: {e}")
@@ -27,6 +28,9 @@ print("Connected to the database.")
 
 app = Flask(__name__)
 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://simon:demopass123@flask_db_container/my_db'
+
+connection = SQLAlchemy(app)
 
 @app.route('/')
 def login():

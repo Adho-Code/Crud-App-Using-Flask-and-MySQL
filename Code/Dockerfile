@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 
 RUN apt-get update && \
-    apt-get install -y python3 python3-pip && \
+    apt-get install -y python3 python3-pip pkg-config libmysqlclient-dev && \
     apt-get remove python3-blinker -y
 
 RUN  pip install --upgrade pip
@@ -19,4 +19,4 @@ COPY . /app
 
 
 EXPOSE 5000
-CMD ["python3", "app.py"]
+CMD ["flask", "run","--host=0.0.0.0"]
