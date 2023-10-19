@@ -20,4 +20,4 @@ COPY . /app
 
 
 EXPOSE 8000
-ENTRYPOINT ["python3", "app.py"]
+ENTRYPOINT ["flask", "run","--host=0.0.0.0"]
