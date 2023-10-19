@@ -1,14 +1,50 @@
+import time
 from flask import Flask, render_template, request, redirect, url_for, flash
 import pymysql.cursors
 
 # Connect to the database
-connection = pymysql.connect(host='flask_db_container',
-                             user='simon',
-                             password='demopass123',
-                             db='my_db',
-                             charset='utf8mb4',
-                             cursorclass=pymysql.cursors.DictCursor)
 
+
+def connect_to_db():
+    max_retries = 10  # Set the maximum number of connection retry attempts
+    retry_interval = 5  # Set the interval (in seconds) between retries
+
+    for retry in range(max_retries):
+        try:
+            connection = pymysql.connect(
+                host="flask_db_container",
+                user="your_username",
+                password="your_password",
+                database="your_database",
+                port=3306,
+                cursorclass=pymysql.cursors.DictCursor
+            )
+            print("Connected to the database.")
+            return connection
+        except Exception as e:
+            print(f"Error: {e}")
+            print(f"Retrying in {retry_interval} seconds...")
+            time.sleep(retry_interval)
+
+    print("Max retries reached. Could not connect to the database.")
+    return None
+
+
+# try:
+#     connection = pymysql.connect(
+#         host='flask_db_container',
+#                              port=3306,
+#                              user='simon',
+#                              password='demopass123',
+#                              database='my_db',
+#                              charset='utf8mb4',
+#                              cursorclass=pymysql.cursors.DictCursor
+#     )
+#     print("Connected to the database.")
+#     connection.close()
+# except Exception as e:
+#     print(f"Error: {e}")
+connection = connect_to_db()
 app = Flask(__name__)
 
 
