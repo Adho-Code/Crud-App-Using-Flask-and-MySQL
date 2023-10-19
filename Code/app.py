@@ -1,14 +1,33 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-import pymysql.cursors
 
-# Connect to the database
-connection = pymysql.connect(host='localhost',
-                             user='devops04',
-                             password='chukula@adho13',
-                             db='ansible',
-                             charset='utf8mb4',
-                             cursorclass=pymysql.cursors.DictCursor)
+import pymysql
 
+# Update this configuration with your MySQL server details
+db_config = {
+    # 'host': '172.17.0.2',  # Use the actual IP address
+    'host': 'host.docker.internal',
+    'user': 'devops04',
+    'password': 'chukula@adho13',
+    'database': 'ansible',
+
+}
+
+try:
+    connection = pymysql.connect(**db_config)
+    print("Successfully connected to MySQL server")
+except pymysql.Error as e:
+    print(f"Error connecting to MySQL server: {e}")
+
+# # Connect to the database
+# connection = pymysql.connect(host='mysql_container',
+#                              user='root',
+#                              password='',
+#                              db='ansible',
+#                              charset='utf8mb4',
+#                              cursorclass=pymysql.cursors.DictCursor)
+
+
+                             
 app = Flask(__name__)
 
 
