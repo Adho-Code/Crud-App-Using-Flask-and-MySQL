@@ -32,25 +32,25 @@
         volumes:
           - /data # Mount an empty volume to /data in the busybox container
 
-    # - name: Build Flask App Docker Image
-    #   docker_image:
-    #     name: flask-app:1.0.0
-    #     source: build
-    #     build:
-    #       path: ./Code
-    #     state: present
+    - name: Build Flask App Docker Image
+      docker_image:
+        name: flask-app:1.0.0
+        source: build
+        build:
+          path: ./Code
+        state: present
 
-    # - name: Run Flask App Container
-    #   docker_container:
-    #     name: flask-app-container
-    #     image: flask-app:1.0.0
-    #     state: started
-    #     ports:
-    #       - '5000:5000'
-    #     volumes:
-    #       - /data:/app/data
-    #     networks:
-    #       - flask_network
+    - name: Run Flask App Container
+      docker_container:
+        name: flask-app-container
+        image: flask-app:1.0.0
+        state: started
+        ports:
+          - '5000:5000'
+        volumes:
+          - /data:/app/data
+        networks:
+          - flask_network
 
     - name: Build MySQL Docker Container
       docker_image:
