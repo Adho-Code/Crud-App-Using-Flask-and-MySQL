@@ -74,4 +74,13 @@ Vagrant.configure("2") do |config|
   #   apt-get update
   #   apt-get install -y apache2
   # SHELL
+  config.vm.network "forwarded_port", guest: 5000, host: 5000
+  # Provisioning configuration for Ansible.
+  config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "installdocker.yaml"
+    end
+  # Provisioning configuration for Ansible.
+    config.vm.provision "ansible" do |ansible|
+    ansible.playbook = "installdeploydockercontainer.yaml"
+    end
 end

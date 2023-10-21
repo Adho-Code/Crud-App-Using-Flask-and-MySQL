@@ -1,6 +1,6 @@
 ---
 - name: Build and Run Flask App and MySQL Containers
-  hosts: demoserver
+  hosts: all
   become: yes
   become_method: sudo
 
@@ -29,41 +29,26 @@
         name: busybox-data-container
         image: busybox
         state: started
+        tty: true
         volumes:
           - /data # Mount an empty volume to /data in the busybox container
-
-    - name: Build Flask App Docker Image
-      docker_image:
-        name: flask-app:1.0.0
-        source: build
-        build:
-          path: ./Code
-        state: present
 
     - name: Run Flask App Container
       docker_container:
         name: flask-app-container
-        image: flask-app:1.0.0
+        image: mrmiano/flaskapp:v1.0.0
         state: started
         ports:
           - '5000:5000'
         volumes:
           - /data:/app/data
         networks:
-          - flask_network
-
-    - name: Build MySQL Docker Container
-      docker_image:
-        name: mysql-db:1.0.0
-        source: build
-        build:
-          path: db
-        state: present
+          - name: flaskapp_network
 
     - name: Run MySQL Container
       docker_container:
         name: mysql-db-container
-        image: mysql-db:1.0.0
+        image: mrmiano/mysqldb_flask:v1.0.0
         state: started
         env:
           MYSQL_ROOT_PASSWORD: '1'
@@ -75,3 +60,5 @@
         volumes:
           - db:/var/lib/mysql
           - /data:/app/data
+        networks:
+          - name: flaskapp_network
